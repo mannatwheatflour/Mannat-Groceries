@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shuddh Atta Store</title>
+
+<style>
+body{
+font-family: Arial, sans-serif;
+margin:0;
+background:#f4f6f9;
+}
+
+header{
+background:#2e7d32;
+color:white;
+padding:15px;
+text-align:center;
+font-size:22px;
+font-weight:bold;
+}
+
+.container{
+max-width:500px;
+margin:20px auto;
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+img{
+width:100%;
+border-radius:10px;
+}
+
+.price{
+font-size:20px;
+font-weight:bold;
+margin:10px 0;
+}
+
+.delivery{
+color:#555;
+margin-bottom:10px;
+}
+
+input, select{
+width:100%;
+padding:10px;
+margin:8px 0;
+border-radius:5px;
+border:1px solid #ccc;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#2e7d32;
+color:white;
+border:none;
+border-radius:5px;
+font-size:16px;
+cursor:pointer;
+}
+
+button:hover{
+background:#1b5e20;
+}
+
+#successMsg{
+display:none;
+color:green;
+margin-top:10px;
+font-weight:bold;
+}
+
+.qr{
+text-align:center;
+margin-top:15px;
+}
+</style>
+</head>
+
+<body>
+
+<header>Shuddh Atta Store</header>
+
+<div class="container">
+
+<img src="product.jpg" alt="Wheat Flour">
+
+<div class="price">Price: ₹229 per packet</div>
+<div class="delivery">Delivery Charge: ₹70</div>
+
+<input type="number" id="qty" value="1" min="1" placeholder="Quantity">
+
+<input type="text" id="name" placeholder="Full Name">
+<input type="text" id="phone" placeholder="Mobile Number">
+<input type="text" id="address" placeholder="Full Address">
+
+<input type="text" id="coupon" placeholder="Coupon Code (Optional)">
+
+<select id="payment">
+<option value="UPI">UPI</option>
+<option value="COD">Cash on Delivery</option>
+</select>
+
+<button onclick="placeOrder()">Place Order</button>
+
+<div id="successMsg">Order Placed Successfully ✅</div>
+
+<div class="qr">
+<p>Scan & Pay</p>
+<img src="qr.png" width="200">
+<p>UPI ID: 9559059929@ibl</p>
+</div>
+
+</div>
+
+<script>
+
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+function placeOrder(){
+
+let name = document.getElementById("name").value;
+let phone = document.getElementById("phone").value;
+let address = document.getElementById("address").value;
+let coupon = document.getElementById("coupon").value;
+let payment = document.getElementById("payment").value;
+let qty = parseInt(document.getElementById("qty").value);
+
+if(!name || !phone || !address){
+alert("Please fill all details");
+return;
+}
+
+if(qty < 1){
+alert("Minimum quantity is 1");
+return;
+}
+
+let productPrice = 229;
+let delivery = 70;
+
+let subtotal = productPrice * qty;
+let discount = 0;
+
+// Coupon valid for 2 months (change date if needed)
+let expiryDate = new Date("2026-04-30");
+let today = new Date();
+
+if(coupon === "NEWBIES" && qty >= 2 && today <= expiryDate){
+discount = subtotal * 0.10;
+}
+
+let total = subtotal + delivery - discount;
+
+let order = {
+name,
+phone,
+address,
+payment,
+qty,
+total,
+date: new Date().toLocaleDateString()
+};
+
+orders.push(order);
+localStorage.setItem("orders", JSON.stringify(orders));
+
+document.getElementById("successMsg").style.display="block";
+
+let message = 
+"🛒 New Order Received\n\n" +
+"Name: "+name+"\n" +
+"Phone: "+phone+"\n" +
+"Quantity: "+qty+"\n" +
+"Payment: "+payment+"\n" +
+"Total: ₹"+total;
+
+let link1 = "https://wa.me/919559059929?text="+encodeURIComponent(message);
+let link2 = "https://wa.me/919793711143?text="+encodeURIComponent(message);
+
+window.open(link1,"_blank");
+window.open(link2,"_blank");
+
+}
+
+</script>
+
+</body>
+</html>
